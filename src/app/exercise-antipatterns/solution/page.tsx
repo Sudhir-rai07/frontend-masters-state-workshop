@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { stat } from 'fs';
 
 // Example 1: Filtered Destinations
 // Problem: Storing filtered destinations in state when they can be derived from the destinations list and filter criteria
@@ -23,24 +24,17 @@ function FilteredDestinations() {
     { id: 3, name: 'New York', country: 'USA', rating: 4.3 },
   ]);
   const [filterRating, setFilterRating] = useState(4.5);
-  const [filteredDestinations, setFilteredDestinations] = useState<
-    typeof destinations
-  >([]);
 
-  // This effect is unnecessary - we can derive filtered destinations
-  useEffect(() => {
-    setFilteredDestinations(
-      destinations.filter((dest) => dest.rating >= filterRating)
-    );
-  }, [destinations, filterRating]);
+  // Removing unnecessary state and useEffect Hook
+  // as we can derive filtered destinations directly
+  const filteredDestinations = destinations.filter(des => des.rating >= filterRating)
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Filtered Destinations</CardTitle>
         <CardDescription>
-          ❌ Problem: Storing filtered destinations in state when they can be
-          derived from the destinations list and filter criteria
+          Solved: Removed unnecessary state and useEffect hook for filtering. Derived filteredDestinations directly from destination and filter criteria.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -83,20 +77,17 @@ function TripSummary() {
     { id: 2, name: 'Hotel', cost: 300 },
     { id: 3, name: 'Activities', cost: 200 },
   ]);
-  const [totalCost, setTotalCost] = useState(0);
 
   // This effect is unnecessary - we can derive total cost
-  useEffect(() => {
-    setTotalCost(tripItems.reduce((sum, item) => sum + item.cost, 0));
-  }, [tripItems]);
+  // We can derive total cost directly from items by using reduce function in js
+  const totalCost = tripItems.reduce((total, item)=> total + item.cost, 0)
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Trip Summary</CardTitle>
         <CardDescription>
-          ❌ Problem: Storing total cost in state when it can be derived from
-          trip items
+          Solved: Removed unnecessary state and useEffect Hook from and derived totalCost from tripItems using reduce method
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -125,25 +116,22 @@ function TripSummary() {
 // Problem: Storing available dates in state when they can be derived from booked dates
 function AvailableDates() {
   const [bookedDates] = useState(['2024-06-01', '2024-06-02', '2024-06-03']);
-  const [availableDates, setAvailableDates] = useState<string[]>([]);
 
-  // This effect is unnecessary - we can derive available dates
-  useEffect(() => {
-    const allDates = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date('2024-06-01');
-      date.setDate(date.getDate() + i);
-      return date.toISOString().split('T')[0];
-    });
-    setAvailableDates(allDates.filter((date) => !bookedDates.includes(date)));
-  }, [bookedDates]);
+  // Fixed: Removed unnecessary state and useEffect hook and derived available dates of this month by filtering out the booked dates
+  const allDates = Array.from({length: 30}).map((_, i)=> {
+    const date = new Date('2024-06-01')
+    date.setDate(date.getDate() + i)
+    return date.toISOString().split('T')[0]
+  })
+
+  const availableDates = allDates.filter(date => !bookedDates.includes(date))
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Available Dates</CardTitle>
         <CardDescription>
-          ❌ Problem: Storing available dates in state when they can be derived
-          from booked dates
+          Solved: Removed unnecessary state and useEffect hook and derived available dates of this month by filtering out the booked dates
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -177,20 +165,22 @@ function TripStatus() {
     isPaid: true,
     isConfirmed: true,
   });
-  const [status, setStatus] = useState('');
-
-  // This effect is unnecessary - we can derive status
-  useEffect(() => {
+  let status: string = "Unknown"
     const today = new Date();
     const start = new Date(trip.startDate);
     const end = new Date(trip.endDate);
 
-    if (!trip.isPaid) setStatus('Payment Pending');
-    else if (!trip.isConfirmed) setStatus('Awaiting Confirmation');
-    else if (today < start) setStatus('Upcoming');
-    else if (today >= start && today <= end) setStatus('In Progress');
-    else setStatus('Completed');
-  }, [trip]);
+
+    if(!trip.isPaid || !trip.isConfirmed){
+       status = "Payment Pending"
+    } else if(start < today && end > today) {
+      status = "In Progress"
+    } else if(today > start){
+      status = "Upcoming"
+    } else if(end < today) {
+      status = "Completed"
+    }
+
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -213,8 +203,7 @@ function TripStatus() {
       <CardHeader>
         <CardTitle>Trip Status</CardTitle>
         <CardDescription>
-          ❌ Problem: Storing trip status in state when it can be derived from
-          trip details
+          Solved: Removed unnecessary state and useEffect by defining a state variable and checked different possible conditions.
         </CardDescription>
       </CardHeader>
       <CardContent>

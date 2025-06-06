@@ -374,7 +374,7 @@ function HotelGallery() {
           ))}
         </div>
         <div className="mt-4 text-xs text-muted-foreground">
-          Debug: Last scroll position: {lastScrollPosition}px
+          Debug: Last scroll position: {lastScrollPositionRef.current}px
         </div>
       </CardContent>
     </Card>
@@ -498,7 +498,7 @@ function HotelSelection() {
                   ? 'border-primary bg-primary/5'
                   : 'hover:bg-accent'
               }`}
-              onClick={() => handleHotelSelect(hotel)}
+              onClick={() => handleHotelSelect(hotel.id)}
             >
               <div className="flex items-center justify-between">
                 <div>
